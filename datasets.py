@@ -25,7 +25,7 @@ class AttDataset(ImageFolder):
 
 def is_valid(s):
     return True
-# A hack to get over with extension chechinkg of DatsetFolder class
+# A hack to get over with extension chechinkg of DatsetFolder class to return true for any type of extension 
 # "Supported extensions are: .jpg,.jpeg,.png,.ppm,.bmp,.pgm,.tif,.tiff,.webp"
 
 class YaleDataset(ImageFolder):
