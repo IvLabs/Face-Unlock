@@ -1,4 +1,6 @@
-.vscode/
+.vscode/*
+*.code-workspace
 
 __pychache__/
+*.py[cod]
 .ipynb_checkpoints
