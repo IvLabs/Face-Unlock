@@ -16,14 +16,12 @@ class ResidualBlock(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=n_out, out_channels=n_out, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(num_features=n_out)
 
+        self.downsample = None
         if use_1x1conv:
             self.downsample = nn.Sequential(OrderedDict([
                 ('conv', nn.Conv2d(in_channels=n_in, out_channels=n_out, kernel_size=1, stride=stride, padding=0, bias=False)),
                 ('bn', nn.BatchNorm2d(num_features=n_out))
             ]))
-        else:
-            self.downsample = None
-
 
     def forward(self, x):
         x_shortcut = x
@@ -49,12 +47,12 @@ class ResidualBlock(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, layers = [2,2,2,2]):
+    def __init__(self, num_classes=128, inplanes=3, layers = [2,2,2,2]):
         # resnet18 : layers = [2, 2, 2, 2]
         # resnet34 : layers = [3, 4, 6, 3]
         super(ResNet, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=inplanes, out_channels=64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(num_features=64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -77,10 +75,7 @@ class ResNet(nn.Module):
             
         self.avgpool = nn.AvgPool2d(kernel_size=7)
         # self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1,1))
-        self.fc = nn.Sequential(
-            nn.Linear(in_features=512*1, out_features=128),
-            nn.ReLU(inplace=True)
-        )
+        self.fc = nn.Linear(in_features=512*1, out_features=num_classes)
 
         # Weight initialization
         for m in self.modules():
@@ -121,12 +116,15 @@ class ResNet(nn.Module):
         # pos = self.semi_forward(triplet[:,1,...])
         # neg = self.semi_forward(triplet[:,2,...])
         
-        batch_size = triplet.shape[0]
-        # triplet = triplet.view(triplet.shape[0]*triplet.shape[1], triplet.shape[2], triplet.shape[3],triplet.shape[4])
-        triplet = triplet.view(triplet.shape[0]*triplet.shape[1], *triplet.shape[2:])
+        # triplet.shape = [m, 3, n_C, H, W]
+        # batch_size = triplet.shape[0]
+        # three = triplet.shape[1]
+        # triplet = triplet.view(triplet.shape[0]*triplet.shape[1], *triplet.shape[2:])
         out = self.semi_forward(triplet)
-        out = out.view(batch_size,3, *out.shape[1:])
-        return torch.unbind(out,dim=1)
+        out = F.normalize(out, p=2, dim=1)
+        # out = out.view(batch_size,3, *out.shape[1:])
+        # anc_embeddings, pos_embeddings, neg_embeddings = torch.unbind(out, dim=1)
+        return out
 
 # ref : https://towardsdatascience.com/understanding-and-visualizing-resnets-442284831be8
 
