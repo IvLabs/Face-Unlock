@@ -119,5 +119,5 @@ test_pairs = LFW_Pairs(
     <img src="media/EpochLoss_resnet44.png" alt="EpochLoss44"  width="400px" height="350px">
     <img src="media/ROC_curve_LFW_44.png" alt="ROC Curve"  width="400px" height="350px"> 
     <br>
-    <small>(a) Epoch Loss. (b) EER Curve. (c) t-SNE Emdeddings.<br>(d) ROC Curve on train set. (e) ROC Curve on test set</small>
+    <small>(a) Epoch Loss (ResNet18). (b) ROC Curve (ResNet18). (c) Epoch Loss (ResNet44). (d) ROC Curve (ResNet44) </small>
 </p>
