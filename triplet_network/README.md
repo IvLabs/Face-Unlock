@@ -34,7 +34,7 @@ The model was trained only on `100 images of classes 0, 1 and 2`, rest images we
 | Accuracy | 97.99% | 98.60% | 97.85% | 95.85% | 99.79% | 97.28% | 99.83% | 89.20% | 98.73% | 98.31% |
 
 
-## [Triplet Net on AT&T Dataset](Triplet%20Net%20ORL) [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ABD-01/Siamese-NN/blob/master/Siamese_ORL_ResNet/Siamese_ORL(ResNet).ipynb)
+## [Triplet Net on AT&T Dataset](Triplet%20Net%20ATT) [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ABD-01/Face-Unlock/blob/master/triplet_network/Triplet%20Net%20ATT/Siamese_ORL(ResNet).ipynb)
 
 
 The dataset was first used to train model with simple CNN, later ResNets implemented from scratch were used for different aproaches.
@@ -54,4 +54,6 @@ Offline triplet selection method was implied during the training and turned out 
   <img src = "Triplet%20Net%20ATT/media/siamese-orl-loss%20on%2030classes(resnet).png" width="450px" height="390px"/>
   <img src = "Triplet%20Net%20ATT/media/siamese-orl-loss%20on%2038classes(resnet18)6.png" width="450px" height="390px"/>
   <img src = "Triplet%20Net%20ATT/media/siamese-orl-accuracy%20on%2030classes(resnet)1.png" width="450px" height="390px"/>
+  <br>
+  <small>(a)Epoch Loss(CNN). (b)Epoch Loss(ResNet-18). (c)Epoch Loss(ResNet-18). (d)Accuracy Curves</small>
 </p>

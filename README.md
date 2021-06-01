@@ -2,7 +2,7 @@
 
 This is Face-Unlock repository of IvLabs and contains the implementation of Triplet Network and FaceNet with ResNet as the backbone architechture implemented from scratch to perform one-shot and zero-shot learning on different datasets.
 
-Our work is categorized in two parts.
+Our work is categorized as following:
 
 - [x] [Triplet Network](triplet_network)
   - [X] Triplet Loss on MNIST
@@ -12,10 +12,16 @@ Our work is categorized in two parts.
 - [x] [FaceNet](facenet)
   - [x] AT&T Dataset
   - [x] LFW Dataset
+  - [ ] Glint360k Dataset
 
-Datasets
+- [ ] Real-Time Face Recognition
+  - [ ] Hosting Web based implementation
+  - [ ] Integrating with Rasberry Pi
 
-* [The AT&T face dataset, “(formerly ‘The ORL Database of Faces’)](https://git-disl.github.io/GTDLBench/datasets/att_face_dataset/) 
+
+## Datasets
+
+* [The AT&T face dataset](https://git-disl.github.io/GTDLBench/datasets/att_face_dataset/) 
   
     There are 10 different images of each of 40 distinct subjects.
 
@@ -34,12 +40,16 @@ Datasets
     1. 13233 images
     2. 5749 people
     3. 1680 people with two or more images
-  
+
+## ResNet
+
+A part of this project was also to understand and implement Residual Networks from scratch which can be found in [model.py](model.py)
 
 References
 
 - [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)
 - [Understanding and visualizing ResNets](https://towardsdatascience.com/understanding-and-visualizing-resnets-442284831be8)
 - [FaceNet: A Unified Embedding for Face Recognition and Clustering](https://arxiv.org/abs/1503.03832)
+- [Triplet Loss and Online Triplet Mining in TensorFlow](https://omoindrot.github.io/triplet-loss)
 - [facenet-pytorch-glint360k](https://github.com/tamerthamoqa/facenet-pytorch-glint360k)
 
