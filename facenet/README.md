@@ -29,16 +29,16 @@ The dataset was split in [35 training classes](media/train_data_ATT.png) and [5 
 
 ### Training
 
-|          Parameter          |    Value   |
-|:---------------------------:|:----------:|
-|        Architechture        |  ResNet18  |
-|     Embeddings Dimension    |     64     |
-| No. of Learnable Parameters | 11,209,344 |
-|            Epochs           |     200    |
-|        Learning Rate        |   0.0002   |
-|          Optimizer          |    Adam    |
-|          Batch Size         |     100    |
-|            Margin           |      1     |
+|          Parameter          |                                                    Value                                                    |
+|:---------------------------:|:-----------------------------------------------------------------------------------------------------------:|
+|        Architechture        | [ResNet18](https://raw.githubusercontent.com/ABD-01/Face-Unlock/master/facenet/media/resnet18_att.onnx.svg) |
+|     Embeddings Dimension    |                                                      64                                                     |
+| No. of Learnable Parameters |                                                  11,209,344                                                 |
+|            Epochs           |                                                     200                                                     |
+|        Learning Rate        |                                                    0.0002                                                   |
+|          Optimizer          |                                                     Adam                                                    |
+|          Batch Size         |                                                     100                                                     |
+|            Margin           |                                                      1                                                      |
 
 
 ### Results
@@ -94,14 +94,14 @@ test_pairs = LFW_Pairs(
 )
 ```
 
-|                                 | Training   |                                                                 |
-|---------------------------------|------------|-----------------------------------------------------------------|
-|          Architechture          |  ResNet-18 |                            ResNet-44                            |
-|     Embeddings<br> Dimension    |     128    |                               128                               |
-| No. of Learnable <br>Parameters | 11,209,344 |                            21,535,936                           |
-|              Epochs             |     100    |                                16                               |
-|          Learning Rate          |   0.0004   | start=0.05<br>ReduceLROnPlateau(factor=0.5,<br> min_lr=0.00001) |
-|            Batch Size           |     64     |                               100                               |
+|                                 |                                                   Training                                                   |                                                                                                          |
+|:-------------------------------:|:------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
+|          Architechture          | [ResNet-18](https://raw.githubusercontent.com/ABD-01/Face-Unlock/master/facenet/media/resnet18_lfw.onnx.svg) | [ResNet-44](https://raw.githubusercontent.com/ABD-01/Face-Unlock/master/facenet/media/resnet44.onnx.svg) |
+|     Embeddings<br> Dimension    |                                                      128                                                     |                                                    128                                                   |
+| No. of Learnable <br>Parameters |                                                  11,209,344                                                  |                                                21,535,936                                                |
+|              Epochs             |                                                      100                                                     |                                                    16                                                    |
+|          Learning Rate          |                                                    0.0004                                                    |                      start=0.05<br>ReduceLROnPlateau(factor=0.5,<br> min_lr=0.00001)                     |
+|            Batch Size           |                                                      64                                                      |                                                    100                                                   |
 
 |  Results  | ResNet18 | ResNet44 |
 |:---------:|:--------:|:--------:|
