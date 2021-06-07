@@ -9,21 +9,25 @@ import torch.nn.functional as F
 class ResidualBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, n_in, n_out, stride = 1, first_block=0):
+    def __init__(self, n_in, n_out, stride = 1, downsample=False):
         super(ResidualBlock, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels=n_in, out_channels=n_out, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=n_in, out_channels=n_out, kernel_size=3,
+                               stride=stride, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(num_features=n_out)
+        
         self.relu = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(in_channels=n_out, out_channels=n_out, kernel_size=3, stride=1, padding=1, bias=False)
+
+        self.conv2 = nn.Conv2d(in_channels=n_out, out_channels=n_out*self.expansion, kernel_size=3,
+                               stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(num_features=n_out)
 
         self.downsample = None
-        if first_block:
-            self.conv1 = nn.Conv2d(in_channels=first_block, out_channels=n_in, kernel_size=3, stride=stride, padding=1, bias=False)
+        if downsample:
             self.downsample = nn.Sequential(OrderedDict([
-                ('conv', nn.Conv2d(in_channels=first_block, out_channels=n_out, kernel_size=1, stride=stride, padding=0, bias=False)),
-                ('bn', nn.BatchNorm2d(num_features=n_out))
+                ('conv', nn.Conv2d(in_channels=n_in, out_channels=n_out*self.expansion, kernel_size=1, 
+                                   stride=stride, padding=0, bias=False)),
+                ('bn', nn.BatchNorm2d(num_features=n_out*self.expansion))
             ]))
 
     def forward(self, x):
@@ -50,23 +54,29 @@ class ResidualBottleneckBlock(nn.Module):
     expansion = 4
 
     def __init__(
-        self, n_in, n_out, stride = 1, first_block=0):
+        self, n_in, n_out, stride = 1, downsample=False):
         super(ResidualBottleneckBlock, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels=n_out, out_channels=n_in, kernel_size=1, stride=1, padding=0, bias=False)
-        self.bn1 = nn.BatchNorm2d(n_in)
-        self.conv2 = nn.Conv2d(in_channels=n_in, out_channels=n_in, kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(n_in)
-        self.conv3 = nn.Conv2d(in_channels=n_in, out_channels=n_out, kernel_size=1, stride=1, padding=0, bias=False)
-        self.bn3 = nn.BatchNorm2d(n_out)
+        self.conv1 = nn.Conv2d(in_channels=n_in, out_channels=n_out, kernel_size=1,
+                               stride=stride, padding=0, bias=False)
+        self.bn1 = nn.BatchNorm2d(n_out)
+
+        self.conv2 = nn.Conv2d(in_channels=n_out, out_channels=n_out, kernel_size=3,
+                               stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(n_out)
+
+        self.conv3 = nn.Conv2d(in_channels=n_out, out_channels=n_out*self.expansion, kernel_size=1,
+                               stride=1, padding=0, bias=False)
+        self.bn3 = nn.BatchNorm2d(n_out*self.expansion)
+
         self.relu = nn.ReLU(inplace=True)
 
         self.downsample = None
-        if first_block:
-            self.conv1 = nn.Conv2d(in_channels=first_block, out_channels=n_in, kernel_size=1, stride=stride, padding=0, bias=False)
+        if downsample:
             self.downsample = nn.Sequential(OrderedDict([
-                ('conv', nn.Conv2d(in_channels=first_block, out_channels=n_out, kernel_size=1, stride=stride, padding=0, bias=False)),
-                ('bn', nn.BatchNorm2d(num_features=n_out))
+                ('conv', nn.Conv2d(in_channels=n_in, out_channels=n_out*self.expansion, kernel_size=1, 
+                                   stride=stride, padding=0, bias=False)),
+                ('bn', nn.BatchNorm2d(num_features=n_out*self.expansion))
             ]))
 
     def forward(self, x):
@@ -139,13 +149,17 @@ class ResNet(nn.Module):
 
     def _make_layer(self, block, channels, num_residuals, stride = 2) -> nn.Sequential:
         block_layers = []
-        first_block = self.inplanes if self.inplanes != channels*block.expansion else 0
+
+        downsample = False
+        if self.inplanes != channels*block.expansion:
+            downsample = True
+
         block_layers.append(
-            (f'block{1}', block(channels, channels*block.expansion, stride, first_block)))
+            (f'block{1}', block(self.inplanes, channels, stride, downsample)))
 
         for i in range(1, num_residuals):
             block_layers.append(
-                (f'block{i+1}', block(channels, channels*block.expansion)))
+                (f'block{i+1}', block(channels*block.expansion, channels)))
 
         self.inplanes = channels*block.expansion
         return nn.Sequential(OrderedDict(block_layers))
