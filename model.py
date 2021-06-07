@@ -58,11 +58,11 @@ class ResidualBottleneckBlock(nn.Module):
         super(ResidualBottleneckBlock, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels=n_in, out_channels=n_out, kernel_size=1,
-                               stride=stride, padding=0, bias=False)
+                               stride=1, padding=0, bias=False)
         self.bn1 = nn.BatchNorm2d(n_out)
 
         self.conv2 = nn.Conv2d(in_channels=n_out, out_channels=n_out, kernel_size=3,
-                               stride=1, padding=1, bias=False)
+                               stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(n_out)
 
         self.conv3 = nn.Conv2d(in_channels=n_out, out_channels=n_out*self.expansion, kernel_size=1,
