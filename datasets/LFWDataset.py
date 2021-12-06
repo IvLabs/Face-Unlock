@@ -1,188 +1,255 @@
 import os
-from typing import Callable, Optional
-import numpy as np
-from tqdm import tqdm
+from typing import Any, Callable, List, Optional, Tuple
+
 from PIL import Image
+
+from torchvision.datasets.utils import check_integrity, download_and_extract_archive, download_url, verify_str_arg
 from torchvision.datasets import VisionDataset
 
 
-class LFW_People(VisionDataset):
-    """
-    LFW People dataset customized as per the `peopleDevTrain.txt` and `peopleDevTest.txt` files.
-    Args:
-        root (string): Root directory path, corresponding to `self.root`.
-        people_path (string): Path to text file having people.
-            E.g, `people.txt` for train set.
-        transform (callable, optional): A function/transform that takes in
-            a sample and returns a transformed version.
-            E.g, ``transforms.RandomCrop`` for images.
-        ext (string): Extension of the images files.
-     Attributes:
-        people (numpy.array): Array of the identities and respective number of images.
-        img_paths (list): List of image paths.
-        ids (list): List of identities, used to get names from image labels.
-        labels (list): List of integer labels of respective identities.
-    """
+class _LFW(VisionDataset):
+
+    base_folder = "lfw-py"
+    download_url_prefix = "http://vis-www.cs.umass.edu/lfw/"
+
+    file_dict = {
+        "original": ("lfw", "lfw.tgz", "a17d05bd522c52d84eca14327a23d494"),
+        "funneled": ("lfw_funneled", "lfw-funneled.tgz", "1b42dfed7d15c9b2dd63d5e5840c86ad"),
+        "deepfunneled": ("lfw-deepfunneled", "lfw-deepfunneled.tgz", "68331da3eb755a505a502b5aacb3c201"),
+    }
+    checksums = {
+        "pairs.txt": "9f1ba174e4e1c508ff7cdf10ac338a7d",
+        "pairsDevTest.txt": "5132f7440eb68cf58910c8a45a2ac10b",
+        "pairsDevTrain.txt": "4f27cbf15b2da4a85c1907eb4181ad21",
+        "people.txt": "450f0863dd89e85e73936a6d71a3474b",
+        "peopleDevTest.txt": "e4bf5be0a43b5dcd9dc5ccfcb8fb19c5",
+        "peopleDevTrain.txt": "54eaac34beb6d042ed3a7d883e247a21",
+        "lfw-names.txt": "a6d0a479bd074669f656265a6e693f6d",
+    }
+    annot_file = {"10fold": "", "train": "DevTrain", "test": "DevTest"}
+    names = "lfw-names.txt"
 
     def __init__(
-            self,
-            root: str,
-            people_path: str = "peopleDevTrain.txt",
-            transform: Optional[Callable] = None,
-            ext: str = "jpg"
-    ) -> None:
-        super(LFW_People, self).__init__(root, transform=transform)
-        self.people = self._get_people(people_path)
-        self.img_paths = []
-        self.ids = []
-        self.labels = []
+        self,
+        root: str,
+        split: str,
+        image_set: str,
+        view: str,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        download: bool = False,
+    ):
+        super().__init__(os.path.join(root, self.base_folder), transform=transform, target_transform=target_transform)
 
-        self.img_paths, self.ids, self.labels = self._get_people_paths(
-            self.root, self.people, ext)
+        self.image_set = verify_str_arg(image_set.lower(), "image_set", self.file_dict.keys())
+        images_dir, self.filename, self.md5 = self.file_dict[self.image_set]
 
-    def _get_people(self, people_path):
-        people = []
-        with open(people_path, 'r') as f:
-            flines = f.readlines()
-            # num_people = int(flines[0])
-            # print("Number of people:", num_people)
-            for line in flines[1:]:
-                identity = line.strip().split()
-                people.append(identity)
-        return np.array(people)
+        self.view = verify_str_arg(view.lower(), "view", ["people", "pairs"])
+        self.split = verify_str_arg(split.lower(), "split", ["10fold", "train", "test"])
+        self.labels_file = f"{self.view}{self.annot_file[self.split]}.txt"
+        self.data: List[Any] = []
 
-    def _get_people_paths(self, images_dir, people, ext="jpg"):
-        num_skipped = 0
-        img_paths = []
-        img_ids = []
-        img_id_labels = []
-        bar = tqdm(enumerate(people), desc="Getting images", total=len(people))
-        print()
-        for label, (identity, num_imgs) in bar:
-            for idx in range(1, int(num_imgs) + 1):
-                img_path = os.path.join(
-                    images_dir, identity, "{}_{:04d}.{}".format(identity, idx, ext))
-                if os.path.exists(img_path):
-                    img_paths.append(img_path)
-                    img_ids.append(identity)
-                    img_id_labels.append(label)
-                else:
-                    num_skipped += 1
-                    print("Not found:", img_path)
-        if num_skipped > 0:
-            print(f"Skipped {num_skipped} images")
+        if download:
+            self.download()
 
-        return img_paths, img_ids, img_id_labels
+        if not self._check_integrity():
+            raise RuntimeError("Dataset not found or corrupted. You can use download=True to download it")
+
+        self.images_dir = os.path.join(self.root, images_dir)
+
+    def _loader(self, path: str) -> Image.Image:
+        with open(path, "rb") as f:
+            img = Image.open(f)
+            return img.convert("RGB")
+
+    def _check_integrity(self):
+        st1 = check_integrity(os.path.join(self.root, self.filename), self.md5)
+        st2 = check_integrity(os.path.join(self.root, self.labels_file), self.checksums[self.labels_file])
+        if not st1 or not st2:
+            return False
+        if self.view == "people":
+            return check_integrity(os.path.join(self.root, self.names), self.checksums[self.names])
+        return True
+
+    def download(self):
+        if self._check_integrity():
+            print("Files already downloaded and verified")
+            return
+        url = f"{self.download_url_prefix}{self.filename}"
+        download_and_extract_archive(url, self.root, filename=self.filename, md5=self.md5)
+        download_url(f"{self.download_url_prefix}{self.labels_file}", self.root)
+        if self.view == "people":
+            download_url(f"{self.download_url_prefix}{self.names}", self.root)
+
+    def _get_path(self, identity, no):
+        return os.path.join(self.images_dir, identity, f"{identity}_{int(no):04d}.jpg")
+
+    def extra_repr(self) -> str:
+        return f"Alignment: {self.image_set}\nSplit: {self.split}"
 
     def __len__(self):
-        return self.img_paths.__len__()
-
-    def loader(self, path: str) -> Image.Image:
-        with open(path, 'rb') as f:
-            img = Image.open(f)
-            return img.convert('RGB')
-
-    def __getitem__(self, idx):
-        path = self.img_paths[idx]
-        label = self.labels[idx]
-        sample = self.loader(path)
-        if self.transform is not None:
-            sample = self.transform(sample)
-
-        return sample, label
+        return len(self.data)
 
 
-class LFW_Pairs(VisionDataset):
-    """
-    LFW Pairs dataset customized as per the `pairsDevTrain.txt` and `pairsDevTest.txt` files.
+class LFWPeople(_LFW):
+    """`LFW <http://vis-www.cs.umass.edu/lfw/>`_ Dataset.
+
     Args:
-        root (string): Root directory path, corresponding to `self.root`.
-        pairs_path (string): Path to text file having people.
-            E.g, `pairs.txt`.
-            both extensions and is_valid_file should not be passed.
-        transform (callable, optional): A function/transform that takes in
-            a sample and returns a transformed version.
-            E.g, ``transforms.RandomCrop`` for images.
-        ext (string): Extension of the images files.
-     Attributes:
-        pairs (numpy.array): Array of the pairs from the text file.
-        is_same_list (list): List of boolean values corresponding to each pair being
-            `same` or `different`.
-        ids (list): List of identities in a pair.
+        root (string): Root directory of dataset where directory
+            ``lfw-py`` exists or will be saved to if download is set to True.
+        split (string, optional): The image split to use. Can be one of ``train``, ``test``,
+            ``10fold`` (default).
+        image_set (str, optional): Type of image funneling to use, ``original``, ``funneled`` or
+            ``deepfunneled``. Defaults to ``funneled``.
+        transform (callable, optional): A function/transform that  takes in an PIL image
+            and returns a transformed version. E.g, ``transforms.RandomRotation``
+        target_transform (callable, optional): A function/transform that takes in the
+            target and transforms it.
+        download (bool, optional): If true, downloads the dataset from the internet and
+            puts it in root directory. If dataset is already downloaded, it is not
+            downloaded again.
+
     """
 
     def __init__(
-            self,
-            root: str,
-            pairs_path: str,
-            transform: Optional[Callable] = None,
-            ext: str = "jpg"
-    ) -> None:
-        super(LFW_Pairs, self).__init__(root, transform=transform)
-        self.pairs = self._get_pairs(pairs_path)
-        self.pair_paths = []
-        self.is_same_list = []
-        self.ids = []
+        self,
+        root: str,
+        split: str = "10fold",
+        image_set: str = "funneled",
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        download: bool = False,
+    ):
+        super().__init__(root, split, image_set, "people", transform, target_transform, download)
 
-        self.pair_paths, self.is_same_list, self.ids = self._get_pairs_path(
-            self.root, self.pairs, ext)
+        self.class_to_idx = self._get_classes()
+        self.data, self.targets = self._get_people()
 
-    def _get_pairs(self, pairs_path):
-        pairs = []
-        with open(pairs_path, 'r') as f:
-            flines = f.readlines()
-            for line in flines[1:]:
-                pair = line.strip().split()
-                pairs.append(pair)
-        return np.array(pairs, dtype=object)
+    def _get_people(self):
+        data, targets = [], []
+        with open(os.path.join(self.root, self.labels_file)) as f:
+            lines = f.readlines()
+            n_folds, s = (int(lines[0]), 1) if self.split == "10fold" else (1, 0)
 
-    def _get_pairs_path(self, images_dir, pairs, ext="jpg"):
-        num_skipped = 0
-        pair_paths = []
-        is_same = []
-        img_ids = []
-        bar = tqdm(pairs, desc="Getting pairs", total=len(pairs))
-        print()
-        for pair in bar:
-            if len(pair) == 3:
-                img1 = os.path.join(images_dir, pair[0], "{}_{:04d}.{}".format(
-                    pair[0], int(pair[1]), ext))
-                img2 = os.path.join(images_dir, pair[0], "{}_{:04d}.{}".format(
-                    pair[0], int(pair[2]), ext))
-                same = True
-                img_ids.append((pair[0]))
-            elif len(pair) == 4:
-                img1 = os.path.join(images_dir, pair[0], "{}_{:04d}.{}".format(
-                    pair[0], int(pair[1]), ext))
-                img2 = os.path.join(images_dir, pair[2], "{}_{:04d}.{}".format(
-                    pair[2], int(pair[3]), ext))
-                same = False
-                img_ids.append((pair[0], pair[2]))
-            if os.path.exists(img1) and os.path.exists(img2):
-                pair_paths.append((img1, img2))
-                is_same.append(same)
+            for fold in range(n_folds):
+                n_lines = int(lines[s])
+                people = [line.strip().split("\t") for line in lines[s + 1 : s + n_lines + 1]]
+                s += n_lines + 1
+                for i, (identity, num_imgs) in enumerate(people):
+                    for num in range(1, int(num_imgs) + 1):
+                        img = self._get_path(identity, num)
+                        data.append(img)
+                        targets.append(self.class_to_idx[identity])
+
+        return data, targets
+
+    def _get_classes(self):
+        with open(os.path.join(self.root, self.names)) as f:
+            lines = f.readlines()
+            names = [line.strip().split()[0] for line in lines]
+        class_to_idx = {name: i for i, name in enumerate(names)}
+        return class_to_idx
+
+    def __getitem__(self, index: int) -> Tuple[Any, Any]:
+        """
+        Args:
+            index (int): Index
+
+        Returns:
+            tuple: Tuple (image, target) where target is the identity of the person.
+        """
+        img = self._loader(self.data[index])
+        target = self.targets[index]
+
+        if self.transform is not None:
+            img = self.transform(img)
+
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+
+        return img, target
+
+    def extra_repr(self) -> str:
+        return super().extra_repr() + f"\nClasses (identities): {len(self.class_to_idx)}"
+
+
+class LFWPairs(_LFW):
+    """`LFW <http://vis-www.cs.umass.edu/lfw/>`_ Dataset.
+
+    Args:
+        root (string): Root directory of dataset where directory
+            ``lfw-py`` exists or will be saved to if download is set to True.
+        split (string, optional): The image split to use. Can be one of ``train``, ``test``,
+            ``10fold``. Defaults to ``10fold``.
+        image_set (str, optional): Type of image funneling to use, ``original``, ``funneled`` or
+            ``deepfunneled``. Defaults to ``funneled``.
+        transform (callable, optional): A function/transform that  takes in an PIL image
+            and returns a transformed version. E.g, ``transforms.RandomRotation``
+        target_transform (callable, optional): A function/transform that takes in the
+            target and transforms it.
+        download (bool, optional): If true, downloads the dataset from the internet and
+            puts it in root directory. If dataset is already downloaded, it is not
+            downloaded again.
+
+    """
+
+    def __init__(
+        self,
+        root: str,
+        split: str = "10fold",
+        image_set: str = "funneled",
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        download: bool = False,
+    ):
+        super().__init__(root, split, image_set, "pairs", transform, target_transform, download)
+
+        self.pair_names, self.data, self.targets = self._get_pairs(self.images_dir)
+
+    def _get_pairs(self, images_dir):
+        pair_names, data, targets = [], [], []
+        with open(os.path.join(self.root, self.labels_file)) as f:
+            lines = f.readlines()
+            if self.split == "10fold":
+                n_folds, n_pairs = lines[0].split("\t")
+                n_folds, n_pairs = int(n_folds), int(n_pairs)
             else:
-                num_skipped += 1
-                print("Not found:", img1, "or", img2)
-            if num_skipped > 0:
-                print(f"Skipped {num_skipped} images")
-        return pair_paths, is_same, img_ids
+                n_folds, n_pairs = 1, int(lines[0])
+            s = 1
 
-    def __len__(self):
-        return self.pair_paths.__len__()
+            for fold in range(n_folds):
+                matched_pairs = [line.strip().split("\t") for line in lines[s : s + n_pairs]]
+                unmatched_pairs = [line.strip().split("\t") for line in lines[s + n_pairs : s + (2 * n_pairs)]]
+                s += 2 * n_pairs
+                for pair in matched_pairs:
+                    img1, img2, same = self._get_path(pair[0], pair[1]), self._get_path(pair[0], pair[2]), 1
+                    pair_names.append((pair[0], pair[0]))
+                    data.append((img1, img2))
+                    targets.append(same)
+                for pair in unmatched_pairs:
+                    img1, img2, same = self._get_path(pair[0], pair[1]), self._get_path(pair[2], pair[3]), 0
+                    pair_names.append((pair[0], pair[2]))
+                    data.append((img1, img2))
+                    targets.append(same)
 
-    def loader(self, path: str) -> Image.Image:
-        with open(path, 'rb') as f:
-            img = Image.open(f)
-            return img.convert('RGB')
+        return pair_names, data, targets
 
-    def __getitem__(self, idx):
-        path1, path2 = self.pair_paths[idx]
-        is_same = self.is_same_list[idx]
-        sample1 = self.loader(path1)
-        sample2 = self.loader(path2)
+    def __getitem__(self, index: int) -> Tuple[Any, Any, int]:
+        """
+        Args:
+            index (int): Index
+
+        Returns:
+            tuple: (image1, image2, target) where target is `0` for different indentities and `1` for same identities.
+        """
+        img1, img2 = self.data[index]
+        img1, img2 = self._loader(img1), self._loader(img2)
+        target = self.targets[index]
+
         if self.transform is not None:
-            sample1 = self.transform(sample1)
-            sample2 = self.transform(sample2)
+            img1, img2 = self.transform(img1), self.transform(img2)
 
-        return sample1, sample2, is_same
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+
+        return img1, img2, target
