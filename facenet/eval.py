@@ -39,22 +39,23 @@ def evaluate(distances, labels, roc_curve=False):
         youdens[idx] = vals[idx] - fars[idx] # sensitivity + specificity — 1
     best_threshold_idx = np.argmax(youdens) 
 
+    fig = None
     if roc_curve:
-        fig = plt.figure()
-        plt.plot(fars, vals, marker = '.', c='r')
-        plt.plot([0,1], [0,1], linestyle='--')
-        plt.scatter(fars[best_threshold_idx], vals[best_threshold_idx], c='black', label='Optimal Threshold')
-        plt.grid()
-        plt.title('ROC Curve')
-        plt.xlabel('False Accept Rate (FAR)')
-        plt.ylabel('True Accept Rate (VAL)')
-        plt.legend()
-        plt.savefig('ROC_curve')
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.plot(fars, vals, marker = '.', c='r')
+        ax.plot([0,1], [0,1], linestyle='--', label='random')
+        ax.scatter(fars[best_threshold_idx], vals[best_threshold_idx], c='black', label='Optimal Threshold')
+        ax.grid()
+        ax.title.set_text('ROC Curve')
+        ax.xlabel('False Accept Rate (FAR)')
+        ax.ylabel('True Accept Rate (VAL)')
+        ax.legend()
+        # ax.savefig('ROC_curve')
+        # ax.show()
 
 
     true_accept_rate, false_accept_rate, precision, accuracy = \
          calculate_metrics(thresholds[best_threshold_idx], distances, labels)
 
-    return thresholds[best_threshold_idx], true_accept_rate, false_accept_rate, precision, accuracy
+    return thresholds[best_threshold_idx], true_accept_rate, false_accept_rate, precision, accuracy, fig
 
