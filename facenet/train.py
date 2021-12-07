@@ -1,9 +1,10 @@
 import argparse
 import random
 import os
-from torchvision import models
+# from torchvision import models
 from tqdm import tqdm
 from termcolor import colored
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -96,6 +97,8 @@ def main():
     seed_init()
 
     if log_wandb:
+        now = datetime.now().strftime("%d-%b %H:%M")
+        wandb.init(project="Face-Unlock", name=f"Run_{now}")
         config = wandb.config
         config.batch_size = p.batch_size
         config.epochs = p.epochs
