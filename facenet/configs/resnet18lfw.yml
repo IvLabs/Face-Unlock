@@ -45,5 +45,5 @@ num_workers: 2
 # Scheduler
 scheduler: onecyclelr
 scheduler_kwargs:
-  max_lr: 0.05
+  max_lr: 0.005
   min_lr: 0.000005

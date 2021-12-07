@@ -152,27 +152,27 @@ def main():
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        print(colored('Resuming from epoch {}'.format(start_epoch), 'blue'))
     
     else:
         print(colored('No checkpoint. Training from scratch.'.format(args.resume), 'blue'))
         start_epoch = 0
     
-    # for epoch in range(start_epoch, p.epochs):
-    for epoch in range(start_epoch, 1):
+    for epoch in range(start_epoch, p.epochs):
         
-        # epoch_loss = train(p, train_dataset, model, criterion, optimizer)
-        # scheduler.step()
-        # if log_wandb:
-        #     # wandb.log({"loss": loss.item()})
-        #     wandb.log({"epoch_loss": epoch_loss,
-        #                 "lr":optimizer.state_dict()["param_groups"][0]['lr']},
-        #                 commit=True)
+        epoch_loss = train(p, train_dataset, model, criterion, optimizer)
+        scheduler.step()
+        if log_wandb:
+            # wandb.log({"loss": loss.item()})
+            wandb.log({"epoch_loss": epoch_loss,
+                        "lr":optimizer.state_dict()["param_groups"][0]['lr']},
+                        commit=True)
         
-        # if epoch % 5 == 0:
-        #     tar, precision, accuracy, far, best_threshold = validate(model, val_loader)
-        #     print("Best Threshold: {}\nTrue Acceptance: {:.3f}\nFalse Acceptance: {:.3f}\nPrecision: {:.3f}\nAccuracy: {:.3f}".format(best_threshold, tar, far, precision, accuracy))
+        if epoch % 5 == 0:
+            tar, precision, accuracy, far, best_threshold = validate(model, val_loader)
+            print("Epoch: {}\nBest Threshold: {}\nTrue Acceptance: {:.3f}\nFalse Acceptance: {:.3f}\nPrecision: {:.3f}\nAccuracy: {:.3f}".format(epoch, best_threshold, tar, far, precision, accuracy))
         
-        if epoch % 10 == 0:
+        if epoch % 5 == 0:
             # Save model checkpoint
             state = {
                 'epoch': epoch+1,
@@ -182,7 +182,7 @@ def main():
                 'model_architecture': p.backbone,
                 'optimizer_state_dict': optimizer.state_dict(),
                 'scheduler_state_dict': scheduler.state_dict(),
-                # 'best_distance_threshold': best_threshold
+                'best_distance_threshold': best_threshold
             }
             # Save model checkpoint
             now = datetime.now().strftime("%d-%b %H:%M")

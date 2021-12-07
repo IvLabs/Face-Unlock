@@ -188,7 +188,7 @@ def batch_hard_triplet_loss(labels, embeddings, margin, squared=False):
 
     # shape (batch_size, 1)
     hardest_positive_dist = torch.max(anchor_positive_dist, dim=1, keepdim=True).values
-    print("hardest_positive_dist", hardest_positive_dist.mean())
+    # print("hardest_positive_dist", hardest_positive_dist.mean())
 
     # For each anchor, get the hardest negative
     # First, we need to get a mask for every valid negative (they should have different labels)
@@ -200,7 +200,7 @@ def batch_hard_triplet_loss(labels, embeddings, margin, squared=False):
 
     # shape (batch_size,)
     hardest_negative_dist = torch.min(anchor_negative_dist, dim=1, keepdim=True).values
-    print("hardest_negative_dist", hardest_negative_dist.mean())
+    # print("hardest_negative_dist", hardest_negative_dist.mean())
 
     # Combine biggest d(a, p) and smallest d(a, n) into final triplet loss
     triplet_loss = torch.relu(hardest_positive_dist - hardest_negative_dist + margin)

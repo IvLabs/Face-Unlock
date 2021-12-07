@@ -4,3 +4,6 @@
 __pychache__/
 *.py[cod]
 .ipynb_checkpoints
+
+*/checkpoints/*
+*/wandb/*
