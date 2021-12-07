@@ -18,20 +18,22 @@ import wandb
 
 parser = argparse.ArgumentParser(description="Train LFW on usinf Triplet Loss")
 parser.add_argument('--config', help="Location of config file")
-parser.add_argument('--data_dir', default="/", help="Dataset Location")
-parser.add_argument('--checkpoint_dir', default="/checkpoints/", help="Location of checkpoints to store")
+parser.add_argument('--seed', default=0, help="Seed")
+parser.add_argument('--data_dir', default="./", help="Dataset Location")
+parser.add_argument('--checkpoint_dir', default="./checkpoints/", help="Location of checkpoints to store")
 parser.add_argument('--resume', default=None, help="path to checkpoint from where to resume")
+parser.add_argument('--wandb', default=False, type=bool, help="Log using wandb")
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 log_wandb = True
 
-def seed_init():
-    np.random.seed(0)
-    random.seed(0)
-    torch.manual_seed(0)
+def seed_init(seed):
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed(0)
-        torch.cuda.manual_seed_all(0)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.enabled = False
     torch.backends.cudnn.benchmark = True
     torch.backends.cudnn.deterministic = True
@@ -91,12 +93,20 @@ def validate(model, loader):
 
 
 def main():
+
+    print(colored('Configuration', 'blue'))
     args = parser.parse_args()
     p = create_config(args.config)
+    global log_wandb
+    log_wandb = args.wandb
 
-    seed_init()
+    if not os.path.exists(args.checkpoint_dir):
+        os.makedirs(args.checkpoint_dir)
+
+    seed_init(args.seed)
 
     if log_wandb:
+        print(colored('Using Wandb', 'blue'))
         now = datetime.now().strftime("%d-%b %H:%M")
         wandb.init(project="Face-Unlock", name=f"Run_{now}")
         config = wandb.config
@@ -107,11 +117,12 @@ def main():
         config.fc_layer_size = p.fc_layer_size
         config.train_dataset = "LFW"
         config.architechture = p.backbone
+
     # dataset
     print(colored('Get dataset and dataloaders', 'blue'))
-    train_dataset = get_train_dataset(p)
+    train_dataset = get_train_dataset(p, args.data_dir)
     print(train_dataset)
-    val_dataset = get_val_dataset(p)
+    val_dataset = get_val_dataset(p, args.data_dir)
     val_loader = get_val_loader(p, val_dataset)
 
     # model
@@ -146,19 +157,20 @@ def main():
         print(colored('No checkpoint. Training from scratch.'.format(args.resume), 'blue'))
         start_epoch = 0
     
-    for epoch in range(start_epoch, p.epochs):
+    # for epoch in range(start_epoch, p.epochs):
+    for epoch in range(start_epoch, 1):
         
-        epoch_loss = train(p, train_dataset, model, criterion, optimizer)
-        scheduler.step(epoch_loss)
-        if log_wandb:
-            # wandb.log({"loss": loss.item()})
-            wandb.log({"epoch_loss": epoch_loss,
-                        "lr":optimizer.state_dict()["param_groups"][0]['lr']},
-                        commit="False")
+        # epoch_loss = train(p, train_dataset, model, criterion, optimizer)
+        # scheduler.step()
+        # if log_wandb:
+        #     # wandb.log({"loss": loss.item()})
+        #     wandb.log({"epoch_loss": epoch_loss,
+        #                 "lr":optimizer.state_dict()["param_groups"][0]['lr']},
+        #                 commit=True)
         
-        if epoch % 5 == 0:
-            tar, precision, accuracy, far, best_threshold = validate(model, val_loader)
-            print("Best Threshold: {}\nTrue Acceptance: {:.3f}\nFalse Acceptance: {:.3f}\nPrecision: {:.3f}\nAccuracy: {:.3f}".format(best_threshold, tar, far, precision, accuracy))
+        # if epoch % 5 == 0:
+        #     tar, precision, accuracy, far, best_threshold = validate(model, val_loader)
+        #     print("Best Threshold: {}\nTrue Acceptance: {:.3f}\nFalse Acceptance: {:.3f}\nPrecision: {:.3f}\nAccuracy: {:.3f}".format(best_threshold, tar, far, precision, accuracy))
         
         if epoch % 10 == 0:
             # Save model checkpoint
@@ -170,14 +182,13 @@ def main():
                 'model_architecture': p.backbone,
                 'optimizer_state_dict': optimizer.state_dict(),
                 'scheduler_state_dict': scheduler.state_dict(),
-                'best_distance_threshold': best_threshold
+                # 'best_distance_threshold': best_threshold
             }
             # Save model checkpoint
-            torch.save(state, 'model_training_checkpoints/model_{}_triplet_epoch_{}.pt'.format(
-                    p.backbone,
-                    epoch
-                )
-            )
+            now = datetime.now().strftime("%d-%b %H:%M")
+            path = os.path.join(args.checkpoint_dir, 'model_{}_triplet_epoch_{}_{}.pt'.format(p.backbone, epoch, now))
+            print(colored(f'Saving checkoint at {path}', 'blue'))
+            torch.save(state, path)
 
 if __name__ == '__main__':
     main()

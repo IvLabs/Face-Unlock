@@ -8,11 +8,11 @@ import torchvision.transforms as transforms
 from torchvision.datasets import LFWPeople, LFWPairs
 import torchvision.models as models
 
-def get_train_dataset(p):
-    return LFWPeople(root="/", split=p.train_split, transform=get_transform(p), download=True)
+def get_train_dataset(p, root):
+    return LFWPeople(root, split=p.train_split, transform=get_transform(p), download=True)
 
-def get_val_dataset(p):
-    return LFWPairs(root="/", split=p.test_split, transform=get_transform(p), download=True)
+def get_val_dataset(p, root):
+    return LFWPairs(root, split=p.test_split, transform=get_transform(p), download=True)
 
 def get_transform(p):
     return transforms.Compose([

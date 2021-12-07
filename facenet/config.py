@@ -6,6 +6,7 @@ def create_config(config_file_exp):
    
     with open(config_file_exp, 'r') as stream:
         config = yaml.safe_load(stream)
+        print(yaml.dump(config))
     
     cfg = EasyDict(config)
    
