@@ -6,4 +6,5 @@ __pychache__/
 .ipynb_checkpoints
 
 */checkpoints/*
+!*/checkpoints/.keep
 */wandb/*

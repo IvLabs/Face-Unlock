@@ -74,5 +74,7 @@ def get_scheduler(p, optimizer):
         scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=p.scheduler_kwargs.max_lr, epochs=p.epochs, steps_per_epoch=9525//p.batch_size, verbose=True)
     elif p.scheduler == "exponentiallr":
         scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=p.scheduler_kwargs.gamma, verbose=True)
+    elif p.scheduler == "steplr":
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=p.scheduler_kwargs.step_size, gamma=p.scheduler_kwargs.gamma, verbose=True)
     
     return scheduler
