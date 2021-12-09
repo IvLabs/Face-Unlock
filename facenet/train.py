@@ -80,7 +80,7 @@ def validate(model, loader):
         labels.append(label)
     distances = torch.cat(distances)
     labels = torch.cat(labels)
-    best_threshold, tar, far, precision, accuracy, fig = evaluate(distances.detach().numpy(), labels.numpy(), False)
+    best_threshold, tar, far, precision, accuracy, fig = evaluate(distances.detach().numpy(), labels.numpy(), True)
     if log_wandb:
         wandb.log({"ROC Curve": fig}, commit=False)
         wandb.log({
@@ -162,8 +162,8 @@ def main():
         
         epoch_loss = train(p, train_dataset, model, criterion, optimizer)
         scheduler.step()
+        print(f"Epoch: {epoch} Loss: {epoch_loss:.3f}")
         if log_wandb:
-            # wandb.log({"loss": loss.item()})
             wandb.log({"epoch_loss": epoch_loss,
                         "lr":optimizer.state_dict()["param_groups"][0]['lr']},
                         commit=True)
@@ -182,7 +182,8 @@ def main():
                 'model_architecture': p.backbone,
                 'optimizer_state_dict': optimizer.state_dict(),
                 'scheduler_state_dict': scheduler.state_dict(),
-                'best_distance_threshold': best_threshold
+                'best_distance_threshold': best_threshold,
+                'accuracy':accuracy
             }
             # Save model checkpoint
             now = datetime.now().strftime("%d-%b %H:%M")
