@@ -1,0 +1,49 @@
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Aadesh_Varude/Aadesh Varude.png 223 129 432 389
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Aadhithya_Iyer/Aadhithya Iyer.png 393 52 644 359
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Aayush_Fadia/Aayush Fadia.png 66 60 258 289
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Aditya_Shirwatkar/Aditya Shirwatkar.png 71 62 193 197
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Aditya_Wadichar/Aditya Wadichar.png 244 116 379 279
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Aneesh/Aneesh.png 276 334 626 771
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Arihant_Gaur/Arihant Gaur.png 432 89 718 447
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Atharva_Kathale/Atharva_Kathale.png 483 274 801 664
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Ayush/Ayush.png 1024 1815 2438 3665
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Bipasha_Parui/Bipasha_Parui.png 200 172 672 804
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Fauzan_Farooqui/Fauzan Farooqui.png 69 43 260 292
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Himanshu_Mahajan/Himanshu Mahajan.png 220 117 616 639
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Jayesh_Kandpal/Jayesh Kandpal.png 349 283 643 652
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Kalyani_Sainis/Kalyani Sainis.png 232 125 759 798
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Karthik/Karthik.png 126 30 288 229
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Khurshed_Fitter/Khurshed Fitter.png 259 238 540 549
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Kushagra_Srivastav/Kushagra Srivastav.png 103 108 355 415
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Luqman_Farooqui/Luqman Farooqui.png 225 545 536 951
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Mayank_Bumb/Mayank Bumb.png 321 137 630 515
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Mokshada_Barhate/Mokshada Barhate.png 1290 305 2056 1271
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Nachiket_/Nachiket .png 347 263 793 820
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Nilakshi_Rekhawar/Nilakshi Rekhawar.png 242 129 413 342
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Prakrut_Kotecha/Prakrut Kotecha.png 64 0 183 134
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Prathamesh_Ringe/Prathamesh Ringe.png 281 127 665 600
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Pratik_Raipure/Pratik_Raipure.png 272 120 476 367
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Priyansh_Mehta/Priyansh Mehta.png 276 250 699 798
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Pulkit_Mathur/Pulkit Mathur.png 188 173 585 664
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Raj_Ghugare/Raj Ghugare.png 290 156 479 379
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Rajesh_Nagula/Rajesh Nagula.png 202 52 348 226
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Rishabh_Verma/Rishabh_Verma.png 685 186 1241 868
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Rishika_Bhagwatkar/Rishika Bhagwatkar.png 346 185 466 322
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Ritesh_Zoad/Ritesh_Zoad.png 677 688 1955 2219
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Ritik_Agrawal/Ritik Agrawal.png 208 72 368 264
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Rushika_Joshi/Rushika Joshi.png 134 95 344 371
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Saketh_Bachu/Saketh Bachu.png 493 232 653 422
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Sania/Sania.png 245 181 663 722
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Saurabh_Kemekar/Saurabh Kemekar.png 221 252 461 545
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Shruti_Murarka/Shruti Murarka.png 275 174 547 504
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Sibam_Parida/Sibam_Parida.png 521 448 1604 1791
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Siddharth_Singh/Siddharth_Singh.png 357 273 764 806
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Sushant_Kumar/Sushant Kumar.png 285 391 407 529
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Sushant_jha/Sushant jha.png 951 369 2165 1926
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Tanmay_Pathrabe/Tanmay_Pathrabe.png 66 107 297 386
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Thanmay_Jayakumar/Thanmay Jayakumar.png 287 99 677 599
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Varad_Vaidya/Varad Vaidya.png 186 138 348 341
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Vignesh_Srinivas/Vignesh Srinivas.png 909 603 1508 1360
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/Yagnesh_Devada/Yagnesh_Devada.png 392 443 762 907
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/pareese_pathak/pareese_pathak.png 161 57 390 329
+/content/drive/MyDrive/Face-Unlock/datasets/ivlabs_dataset_cropped/sushlok_shah/sushlok_shah.png 868 705 1273 1237
