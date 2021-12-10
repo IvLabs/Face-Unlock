@@ -73,51 +73,60 @@ The faces were extracted by center crop and then resized to match input shape. F
 MEAN = torch.Tensor([0.5929, 0.4496, 0.3654])
 STD = torch.Tensor([0.2287, 0.1959, 0.1876])
 transform = transforms.Compose([
-    transforms.CenterCrop((105,105)),
+    transforms.CenterCrop((128,98)),
     transforms.Resize((224,224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=MEAN, std=STD),
 ])
 ```
-[LFWDataset.py](./../datasets/LFWDataset.py) contains the custom dataset classes for loading LFW data in both restricted and unrestricted configurations.
-Eg,
+[LFWDataset.py](./../datasets/LFWDataset.py) contains the custom dataset classes for loading LFW data in all configurations. This dataset class was later [contributed](https://github.com/pytorch/vision/commit/d85aa6d392558e169ddd9e6da506ea875d3abec0) to Torchvision library.
+
+### Training Configuration
+
+|          | Architechture | Embeddings<br> Dimension | No. of Learnable <br>Parameters | Epochs |                    Learning Rate                    | Batch Size |
+|:--------:|:-------------:|:------------------------:|:-------------------------------:|:------:|:---------------------------------------------------:|:----------:|
+| Training |   ResNet-18   |            128           |            11,242,176           |   200  | 0.002 <br> (Reduced by factor of 2 every 50 epochs) |     256    |
+
+To train run
+
 ```py
-train_people = LFW_People(
-    root = 'lfw_funneled',
-    people_path = 'drive/MyDrive/lfw-dataset/peopleDevTrain.txt',
-    transform = transform
-)
-test_pairs = LFW_Pairs(
-    root = 'lfw_funneled',
-    pairs_path = 'drive/MyDrive/lfw-dataset/pairsDevTest.txt',
-    transform = transform
-)
+train.py --config configs/resnet18lfw.yml --data_dir ../datasets/lfw  --wandb true
+
 ```
 
-|                                 |                                                   Training                                                   |                                                                                                          |
-|:-------------------------------:|:------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
-|          Architechture          | [ResNet-18](https://raw.githubusercontent.com/ABD-01/Face-Unlock/master/facenet/media/resnet18_lfw.onnx.svg) | [ResNet-44](https://raw.githubusercontent.com/ABD-01/Face-Unlock/master/facenet/media/resnet44.onnx.svg) |
-|     Embeddings<br> Dimension    |                                                      128                                                     |                                                    128                                                   |
-| No. of Learnable <br>Parameters |                                                  11,209,344                                                  |                                                21,535,936                                                |
-|              Epochs             |                                                      100                                                     |                                                    16                                                    |
-|          Learning Rate          |                                                    0.0004                                                    |                      start=0.05<br>ReduceLROnPlateau(factor=0.5,<br> min_lr=0.00001)                     |
-|            Batch Size           |                                                      64                                                      |                                                    100                                                   |
+To resume training
+```
+train.py --config configs/resnet18lfw.yml --data_dir ../datasets/lfw  --wandb true --resume "checkpoints/model_resnet18_triplet_epoch_120_08-Dec 15:57.pt" 
+```
 
-|  Results  | ResNet18 | ResNet44 |
-|:---------:|:--------:|:--------:|
-|  Accuracy |   0.814  |   0.564  |
-|   Recall  |   0.750  |   0.459  |
-|    FAR    |   0.127  |   0.332  |
-| Precision |   0.856  |   0.58   |
-| Threshold |   1.28   |   1.36   |
+**Model State Dict**
+```python
+state = {
+    'epoch': epoch+1,
+    'embedding_dimension': p.fc_layer_size,
+    'batch_size_training': p.batch_size,
+    'model_state_dict': model.state_dict(),
+    'model_architecture': p.backbone,
+    'optimizer_state_dict': optimizer.state_dict(),
+    'scheduler_state_dict': scheduler.state_dict(),
+    'best_distance_threshold': best_threshold,
+    'accuracy':accuracy
+}
+```
+
+### Results
+
+| Accuracy | Precision | Recall | ROC <br> Area Under Curve | Euclidean <br> Distance <Threshold> | TAR @ FAR=1e-2 |
+|:--------:|:---------:|:------:|:-------------------------:|:-----------------------------------:|:--------------:|
+|  88.35%  |   88.46%  | 88.23% |           0.9508          |                1.104                |     61.07%     |
 
 ### Plots
 
 <p align="center">
-    <img src="media/EpochLoss_LFW.png" alt="EpochLoss"  width="400px" height="350px">
-    <img src="media/ROC_curve_LFW.png" alt="ROC curve"  width="400px" height="350px">
-    <img src="media/EpochLoss_resnet44.png" alt="EpochLoss44"  width="400px" height="350px">
-    <img src="media/ROC_curve_LFW_44.png" alt="ROC Curve"  width="400px" height="350px"> 
+    <img src="media/LFWfinal_epochloss.jpeg" alt="EpochLoss"  width="400px" height="350px">
+    <img src="media/roc.png" alt="ROC curve"  width="400px" height="350px">
+    <img src="media/LFWfinal_acc.jpeg" alt="EpochLoss44"  width="400px" height="350px">
+    <img src="media/LFWfinal_lr.jpeg" alt="ROC Curve"  width="400px" height="350px"> 
     <br>
-    <small>(a) Epoch Loss (ResNet18). (b) ROC Curve (ResNet18). (c) Epoch Loss (ResNet44). (d) ROC Curve (ResNet44) </small>
+    <small>(a) Epoch Loss (b) ROC Curve (c) Accuracy (d) Learning Rate </small>
 </p>

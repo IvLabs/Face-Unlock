@@ -1,0 +1,36 @@
+# Loss
+criterion: TripletLoss
+criterion_kwargs:
+   margin: 0.8
+
+# Model
+backbone: resnet34
+fc_layer_size: 128
+
+# Dataset
+train_db_name: LFW
+train_split: train
+test_db_name: LFWPairs
+test_split: 10fold
+
+transformation_kwargs:
+   crop_size: [128, 98]
+   resize: 224
+   normalize:
+      mean: [0.5929, 0.4496, 0.3654]
+      std: [0.2287, 0.1959, 0.1876]
+
+# Hyperparameters
+optimizer: adam
+optimizer_kwargs:
+   lr: 0.004
+
+epochs: 100
+batch_size: 64
+num_workers: 2
+
+# Scheduler
+scheduler: reduceonplateau
+scheduler_kwargs:
+  patience: 5
+  min_lr: 0.00001

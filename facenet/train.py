@@ -152,7 +152,7 @@ def main():
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-        print(colored('Resuming from epoch {}'.format(start_epoch), 'blue'))
+        print(colored('Resuming from epoch {} with lr: {}'.format(start_epoch, optimizer.state_dict()["param_groups"][0]['lr']), 'blue'))
     
     else:
         print(colored('No checkpoint. Training from scratch.'.format(args.resume), 'blue'))
