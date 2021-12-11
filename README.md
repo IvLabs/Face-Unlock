@@ -1,4 +1,7 @@
-# Face-Unlock
+<!-- # Face-Unlock -->
+<h1 align="center">
+  Face-Unlock
+</h1>
 
 <p align="center">
 <!-- [![View WANDB report](https://img.shields.io/badge/View%20report%20on-W%26B-%23f9c20a?style=for-the-badge)](https://wandb.ai/abd1/Face-Unlock/reports/Face-Unlock--VmlldzoxMzEyNjQ4) -->
