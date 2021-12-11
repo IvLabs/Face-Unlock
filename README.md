@@ -1,9 +1,15 @@
 # Face-Unlock
 
+<p align="center">
 <!-- [![View WANDB report](https://img.shields.io/badge/View%20report%20on-W%26B-%23f9c20a?style=for-the-badge)](https://wandb.ai/abd1/Face-Unlock/reports/Face-Unlock--VmlldzoxMzEyNjQ4) -->
 <a href="https://wandb.ai/abd1/Face-Unlock/reports/Face-Unlock--VmlldzoxMzEyNjQ4"><img src="https://img.shields.io/badge/View%20report%20on-W%26B-%23f9c20a?style=for-the-badge" width=25%></a>
+</p>
 
 This is Face-Unlock repository of IvLabs and contains the implementation of Triplet Network and FaceNet with ResNet as the backbone architechture implemented from scratch to perform one-shot and zero-shot learning on different datasets.
+
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/63636498/145682302-ef9cc6be-5289-4968-8aa0-18872684307b.gif" alt="ivpreds" >
+</p>
 
 Our work is categorized as following:
 
