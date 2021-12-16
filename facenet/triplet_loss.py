@@ -5,6 +5,7 @@ and has been refactored from tensorflow to pytorch api.
 """
 
 import torch
+from train import DEVICE
 
 def _pairwise_distances(embeddings, squared=False):
     """Compute the 2D matrix of distances between all the embeddings.
@@ -55,7 +56,7 @@ def _get_anchor_positive_triplet_mask(labels):
         mask: tf.bool `Tensor` with shape [batch_size, batch_size]
     """
     # Check that i and j are distinct
-    indices_equal = torch.eye(labels.shape[0]).bool()
+    indices_equal = torch.eye(labels.shape[0], device=DEVICE).bool()
     indices_not_equal = indices_equal.logical_not()
 
     # Check if labels[i] == labels[j]
@@ -93,7 +94,7 @@ def _get_triplet_mask(labels):
         labels: tf.int32 `Tensor` with shape [batch_size]
     """
     # Check that i, j and k are distinct
-    indices_equal = torch.eye(labels.shape[0]).bool()
+    indices_equal = torch.eye(labels.shape[0], device=DEVICE).bool()
     indices_not_equal = indices_equal.logical_not()
     i_not_equal_j = indices_not_equal.unsqueeze(2)
     i_not_equal_k = indices_not_equal.unsqueeze(1)
@@ -160,7 +161,7 @@ def batch_all_triplet_loss(labels, embeddings, margin, squared=False):
     # Get final mean triplet loss over the positive valid triplets
     triplet_loss = triplet_loss.sum() / (num_positive_triplets + 1e-16)
 
-    return triplet_loss, fraction_positive_triplets
+    return triplet_loss #, fraction_positive_triplets
 
 
 def batch_hard_triplet_loss(labels, embeddings, margin, squared=False):
@@ -187,7 +188,7 @@ def batch_hard_triplet_loss(labels, embeddings, margin, squared=False):
 
     # shape (batch_size, 1)
     hardest_positive_dist = torch.max(anchor_positive_dist, dim=1, keepdim=True).values
-    print("hardest_positive_dist", hardest_positive_dist.mean())
+    # print("hardest_positive_dist", hardest_positive_dist.mean())
 
     # For each anchor, get the hardest negative
     # First, we need to get a mask for every valid negative (they should have different labels)
@@ -199,7 +200,7 @@ def batch_hard_triplet_loss(labels, embeddings, margin, squared=False):
 
     # shape (batch_size,)
     hardest_negative_dist = torch.min(anchor_negative_dist, dim=1, keepdim=True).values
-    print("hardest_negative_dist", hardest_negative_dist.mean())
+    # print("hardest_negative_dist", hardest_negative_dist.mean())
 
     # Combine biggest d(a, p) and smallest d(a, n) into final triplet loss
     triplet_loss = torch.relu(hardest_positive_dist - hardest_negative_dist + margin)
